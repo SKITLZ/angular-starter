@@ -23,11 +23,13 @@ const EvalSourceMapDevToolPlugin = require('webpack/lib/EvalSourceMapDevToolPlug
 module.exports = function (options) {
   const ENV = process.env.ENV = process.env.NODE_ENV = 'development';
   const HOST = process.env.HOST || 'localhost';
-  const PORT = process.env.PORT || 3000;
+  const NEST_PORT = process.env.PORT || 3000;
+  const PORT = process.env.CLIENT_PORT || 3500;
 
   const METADATA = Object.assign({}, buildUtils.DEFAULT_METADATA, {
     host: HOST,
     port: PORT,
+    nestPort: NEST_PORT,
     ENV: ENV,
     HMR: helpers.hasProcessFlag('hot'),
     PUBLIC: process.env.PUBLIC_DEV || HOST + ':' + PORT
@@ -152,6 +154,10 @@ module.exports = function (options) {
         // poll: 1000,
         ignored: /node_modules/
       },
+      proxy: [{
+        context: ['/api'],
+        target: `http://${METADATA.host}:${METADATA.nestPort}`
+      }],
       /**
       * Here you can access the Express app object and add your own custom middleware to it.
       *
